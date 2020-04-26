@@ -85,14 +85,28 @@ read.csv("./tables_figures/table2.csv") %>%
 #### Table 1-1: Patient characteristics: continuous variables
 - Frail patients were older and have higher ANZROD score and APACHE-IIIj score. 
 
-```{r include=FALSE}
-dt %>% select(age, sex,elect,medsurg, chr_resp:cirrhos, frailty,frail_CFS,anzrodriskofdeath,
-              apache3score,apache3riskofdeath,died_icu,died_hosp,admsourc) %>% 
-        tableone::CreateTableOne(vars = names(.), data = ., strata = "frail_CFS") -> tableone
+```{r table1, include=FALSE}
+dt %>% 
+        select(age, sex,elect,medsurg, chr_resp:cirrhos, frailty,frail_CFS,
+              anzrodriskofdeath,apache3score,apache3riskofdeath,died_icu,
+              died_hosp,admsourc) -> dt_table 
 
-tableone$ContTable %>% 
-        print() %>% 
+dt_table %>% 
+        tableone::CreateTableOne(vars = names(.), 
+                                 data = ., 
+                                 strata = "frail_CFS") -> tableone
+
+## make a continuous variable table
+contVars = c("age","anzrodriskofdeath","apache3score","apache3riskofdeath")
+CreateContTable(vars = contVars, data = dt_table, strata = "frail_CFS") -> contTable
+nonNormalVars <- c("anzrodriskofdeath","apache3score","apache3riskofdeath")
+print(contTable, nonnormal = nonNormalVars, test = F) %>%
         write.csv(.,"./tables_figures/table1_cont.csv")
+
+## make a categorical value table
+tableone$CatTable %>% 
+        print(.,test=F) %>% 
+        write.csv(.,"./tables_figures/table1_cat.csv")
 ```
 
 
@@ -109,12 +123,6 @@ read.csv("./tables_figures/table1_cont_edit.csv") %>%
 - Frail cohort has more emergency ICU admissions. 
 - Frail cohort has more comoridities, especially chronic respiratory conditions. 
 - Frail cohort had higher mortality both during ICU and hospital stay. 
-
-```{r include=FALSE}
-tableone$CatTable %>% 
-        print() %>% 
-        write.csv(.,"./tables_figures/table1_cat.csv")
-```
 
 ```{r echo=FALSE}
 read.csv("./tables_figures/table1_cat_edit.csv") %>% 
