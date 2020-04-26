@@ -1,7 +1,7 @@
 ---
 title: "The association between frailty and the predictive performance of ANZROD score"
-author: c("Ryo Ueno","Ashwin Subramaniam")
-date: `r format(Sys.time(), '%d/%m/%Y')`"
+author: "Ryo Ueno, Ashwin Subramaniam" 
+date: "`r format(Sys.time(), '%d/%m/%Y')`"
 output: html_document
 ---
 
@@ -40,7 +40,7 @@ Hence, we need to collect both input and output data with some time label.
 
 ## Preliminary Analysis Results 
 
-#Patient characteristics: continuous variables
+### Patient characteristics: continuous variables
 ```{r}
 dt %>% select(age, sex,elect,medsurg, chr_resp:cirrhos, frailty,frail_CFS,anzrodriskofdeath,
               apache3score,apache3riskofdeath,died_icu,died_hosp,admsourc) %>% 
@@ -51,15 +51,14 @@ tableone$ContTable %>%
         write.csv(.,"./tables_figures/table1_cont.csv")
 ```
 
-#Patient characteristics: continuous variables
+###Patient characteristics: categorical variables
 ```{r}
 tableone$CatTable %>%
         print() %>%
-        as.data.frame() %>% 
         write.csv(.,"./tables_figures/table1_cat.csv")
 ```
 
-#calculate table 2
+###calculate table 2
 ```{r message=FALSE, warning=FALSE}
 roc_calculate <- function(data, i=3){
         data <- data %>% 
@@ -86,7 +85,7 @@ dt %>%
 
 ```
 
-# create figure 1
+### create figure 1
 
 ```{r}
 data <- dt %>% filter(frail_CFS == "non-frail")
@@ -117,7 +116,7 @@ legend("bottomright",
        text.col = c("black","darkgoldenrod", "darkslategray4"))
 ```
 
-# Create fig 2
+### Create fig 2
 ```{r message=FALSE, warning=FALSE}
 roc_plot <- function(data, add = F, lty=1, linecol = "black"){
         pROC::roc(data$died_hosp, predictor = data$anzrodriskofdeath) %>% 
