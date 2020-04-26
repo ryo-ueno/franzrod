@@ -19,17 +19,17 @@ dt <- readRDS("./data/franzrod.obj")
 
 For further details, please refer to this [online repository](https://github.com/ryo313/franzrod)
 <br/>
-<br/>
 
 ### Objectives of this report
 
 - To clarify the motivation of the study
 - To clarify the initial statistic plan
-- To share the preliminary analysis results 
+- To share the exploratory analysis results 
 
 ### Summary of the key findings 
+- Both discrimination and calibration of ANZROD score differs amongst different frailty population 
+- This result may support the future research to incorporate frailty score into ANZROD score
 
-- Both discrimination and calibration of ANZROD score differs amongst different frailty population as follows: 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
 read.csv("./tables_figures/table2.csv") %>%
         select(-1) %>% knitr::kable()
@@ -37,48 +37,92 @@ read.csv("./tables_figures/table2.csv") %>%
 
 
 ### Background
+- **Australian and New Zealand Risk of Death (ANZROD)** specific for Australian and New Zealand intensive care units (ICUs) has better calibration and discrimination in predicting mortality compared with the existing prognostic models sucha as APACHE III-j model.
 
-This project is to assess the performance of ANZROD score and its performance amongst different 
-This is an R Markdown document. This summarises the data cleaning in PRO-ACT data, an [open data repository](https://nctu.partners.org/ProACT/Document/DisplayLatest/2) from multiple randomised controlled trials for patients with ALS. 
+- **Frailty** is a "physiological age" rather than a "chronological age". 
 
-This longitudal dataset includes >4000 ALS patients with their functional and survival data. We aim to create a dataset with  
-**any values taken within 3 months**  
-to predict 
-**the functional decline or survival in 3-12 months after inclusion.**  
-Hence, we need to collect both input and output data with some time label. 
+- Frailty is defined as a multidimensional syndrome characterised by a decline of physical, physiologic and cognitive reserves. Frailty increases with age and is characterised by a heterogeneous combination of decreased mobility, weakness, reduced muscle mass, poor nutritional status and diminished cognitive function. 
+
+- **ANZROD does not factor in frailty**, which is associated with worse prognosis in critically ill patients. Frailty is an independent risk factor after adjustment for classic risks such as severity, age, sex, comorbidities. 
+
+- We hypothesized that **ANZROD may underestimate the risk of mortality amongst frail populations**. 
 
 ### Methods
+<br/>
 
+#### Study design
+- **Study design:** A multicentre retrospective cohort study
+- **Setting:** 147 ICUs in Australia and New Zealand
+- **Inclusion:** All ICU admissions from 2017 to 2018 in the ANZICS-APD
+- **Exclusion:** Patietns without Clinical Frailty Scale data
+- **prediction outcome:** in-hospital mortality
+- **Frailty:** frailty was measured using [Clinical Frailty Scale (CFS)](https://github.com/ryo313/franzrod/blob/master/others/ClinicalFrailtyScale.png)  
+
+#### Statistic analysis
+- All the patients were categorized in the following three groups
+<br/>
+        1. **non-frail (CFS = 1-3)**
+<br/>
+        2. **pre-frail (CFS = 4)**
+<br/>
+        3. **frail (CFS = 5-9)**
+
+- In each cohort, we assessed the following predictive value of ANZROD to predict in-hospital mortality
+<br/>
+        1. **Area under the receiver operating characteristic curve (AUROC)**
+<br/>
+        2. **Brier score**
+<br/>
+        3. **Standardized Mortality Ratio (SMR)** 
+<br/>
+        4. **Hosmer-Lemeshow goodness-of-fit**
+
+- We created the receiver operating characteristic curve and calibration curve to.
+- please refer to the [supplementary document](https://github.com/ryo313/franzrod/blob/master/citations/Paul2013_supplementary/1-s2.0-S0883944113002566-mmc3.doc) for the details of each values. 
 
 ### Preliminary Analysis Results 
 
-#### Patient characteristics: continuous variables
+#### Table 1-1: Patient characteristics: continuous variables
+Frail patients were older and have higher ANZROD score and APACHE-IIIj score. 
 ```{r include=FALSE}
 dt %>% select(age, sex,elect,medsurg, chr_resp:cirrhos, frailty,frail_CFS,anzrodriskofdeath,
               apache3score,apache3riskofdeath,died_icu,died_hosp,admsourc) %>% 
         tableone::CreateTableOne(vars = names(.), data = ., strata = "frail_CFS") -> tableone
 
-tableone$ContTable %>% print() -> conttable
-conttable %>% 
+tableone$ContTable %>% 
+        print() %>% 
         write.csv(.,"./tables_figures/table1_cont.csv")
 ```
 
 
 ```{r echo=FALSE}
-conttable %>% knitr::kable()
+read.csv("./tables_figures/table1_cont.csv") %>% 
+        as.data.frame() %>% 
+        select(-5,-6) %>% 
+        knitr::kable()
 ```
 
-####Patient characteristics: categorical variables
+#### Table 1-2: Patient characteristics: categorical variables
 ```{r include=FALSE}
-tableone$CatTable %>% print() -> cattable
-cattable %>% write.csv(.,"./tables_figures/table1_cat.csv")
+tableone$CatTable %>% 
+        print() %>% 
+        write.csv(.,"./tables_figures/table1_cat.csv")
 ```
+
+- Frail cohort has more female patients.
+- Frail cohort has more emergency ICU admissions. 
+- Frail cohort has more comoridities, especially chronic respiratory conditions. 
+- Frail cohort had higher mortality both during ICU and hospital stay. 
+<br/>
 
 ```{r echo=FALSE}
-cattable %>% knitr::kable()
+read.csv("./tables_figures/table1_cat.csv") %>% 
+        as.data.frame() %>% 
+        select(-5,-6) %>% 
+        knitr::kable()
 ```
 
-####calculate table 2
+####Table 2: Comparison of predictive values of ANZROD to predict in-hospital mortality in three cohorts
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 roc_calculate <- function(data, i=3){
         data <- data %>% 
@@ -104,14 +148,18 @@ dt %>%
 tabletwo %>% write.csv(.,"./tables_figures/table2.csv")
 
 ```
-
+- ROC was lower amongst frail cohort compared with non-frail cohort
+- Calibration values were similar amongst three categories. 
+- needs proofreading for the code
 ```{r echo=FALSE}
 tabletwo %>% knitr::kable()
 ```
 
 
-#### create figure 1
-
+#### Figure 1: Calibration Curve of ANZROD to predict inhospital mortality in three cohorts
+- Diagonal line represents the line of perfect calibration.
+- Graphically, calibration performance is worse amongst frail population. 
+- needs proofreading for the code
 ```{r echo=FALSE}
 data <- dt %>% filter(frail_CFS == "non-frail")
 data_pre <- dt %>% filter(frail_CFS == "pre-frail")
@@ -141,7 +189,7 @@ legend("bottomright",
        text.col = c("black","darkgoldenrod", "darkslategray4"))
 ```
 
-#### Create fig 2
+#### Figure 2: ROC of ANZROD to predict in-hospital mortality in three cohorts
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 roc_plot <- function(data, add = F, lty=1, linecol = "black"){
         pROC::roc(data$died_hosp, predictor = data$anzrodriskofdeath) %>% 
@@ -160,4 +208,8 @@ legend("bottomright",
        text.col = c("black","darkgoldenrod", "darkslategray4"))
 ```
 
-
+#### Limitations
+- selection bias (patients without CFS were excluded)
+- this study includes only 5% of the original cohort used for the development of ANZROD
+- the clinical significance of the observed difference is unknown
+- This result may just reflect the non-collapsibility of AUC; however, both clinical and epidemiological evidence supports the independent association of frailty with mortality
