@@ -168,7 +168,7 @@ tabletwo %>%
 - Graphically, calibration performance is worse amongst frail population. 
 - needs proofreading for the code
 
-```{r echo=FALSE}
+```{r figs, echo=FALSE, fig.cap="\\label{fig:figs}Figure 1:Calibration Curve of ANZROD to predict inhospital mortality in three cohorts"}
 data <- dt %>% filter(frail_CFS == "non-frail")
 data_pre <- dt %>% filter(frail_CFS == "pre-frail")
 data_frail <- dt %>% filter(frail_CFS == "frail")
@@ -209,7 +209,7 @@ legend("bottomright",
         3. **frail:** 0.841 [ 0.821 ; 0.861 ]
 <br/>
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.cap="\\label{fig:figs}Figure 2: ROC of ANZROD to predict in-hospital mortality in three cohorts"}
 roc_plot <- function(data, add = F, lty=1, linecol = "black"){
         pROC::roc(data$died_hosp, predictor = data$anzrodriskofdeath) %>% 
                 plot(.,add = add, lty=lty, col = linecol)
