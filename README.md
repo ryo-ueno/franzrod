@@ -8,7 +8,7 @@ R markdown document to reproduce the analysis in the paper
 * supplementarymaterials.pdf:
 
 ## Licence
-[MIT](https://github.com/ryo313/LICENSE)
+[MIT](https://github.com/ryo313/franzrod/blob/master/LICENSE)
 
 ## Dependencies
 * R ver. 3.6.1
