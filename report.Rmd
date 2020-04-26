@@ -1,0 +1,139 @@
+---
+title: "The association between frailty and the predictive performance of ANZROD score"
+author: c("Ryo Ueno","Ashwin Subramaniam")
+date: `r format(Sys.time(), '%d/%m/%Y')`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+require("tidyverse")
+require("knitr")
+require(tableone)
+require(pROC)
+require(ModelMetrics)
+require(ResourceSelection)
+require(gbm)
+
+rm(list=ls())
+dt <- readRDS("./data/franzrod.obj")
+```
+
+## Objectives of this report
+
+- To clarify the motivation of the study
+- To clarify the initial statistic plan
+- To share the preliminary analysis results 
+
+## Background
+
+This project is to assess the performance of ANZROD score and its performance amongst different 
+This is an R Markdown document. This summarises the data cleaning in PRO-ACT data, an [open data repository](https://nctu.partners.org/ProACT/Document/DisplayLatest/2) from multiple randomised controlled trials for patients with ALS. 
+
+This longitudal dataset includes >4000 ALS patients with their functional and survival data. We aim to create a dataset with  
+**any values taken within 3 months**  
+to predict 
+**the functional decline or survival in 3-12 months after inclusion.**  
+Hence, we need to collect both input and output data with some time label. 
+
+## Statistical methods
+
+
+## Preliminary Analysis Results 
+
+#Patient characteristics: continuous variables
+```{r}
+dt %>% select(age, sex,elect,medsurg, chr_resp:cirrhos, frailty,frail_CFS,anzrodriskofdeath,
+              apache3score,apache3riskofdeath,died_icu,died_hosp,admsourc) %>% 
+        tableone::CreateTableOne(vars = names(.), data = ., strata = "frail_CFS") -> tableone
+
+tableone$ContTable %>% 
+        print() %>% 
+        write.csv(.,"./tables_figures/table1_cont.csv")
+```
+
+#Patient characteristics: continuous variables
+```{r}
+tableone$CatTable %>%
+        print() %>%
+        as.data.frame() %>% 
+        write.csv(.,"./tables_figures/table1_cat.csv")
+```
+
+#calculate table 2
+```{r message=FALSE, warning=FALSE}
+roc_calculate <- function(data, i=3){
+        data <- data %>% 
+                filter(!is.na(died_hosp) & !is.na(anzrodriskofdeath)) %>%
+                mutate(died_hosp_num = as.numeric(died_hosp)-1)
+        ci<- pROC::roc(data$died_hosp, predictor = data$anzrodriskofdeath) %>% ci()
+        brier <- ModelMetrics::brier(data$died_hosp_num, data$anzrodriskofdeath)
+        HL_list <- ResourceSelection::hoslem.test(data$died_hosp_num, data$anzrodriskofdeath,20)
+        data.frame(
+                ROC = paste(median(ci) %>% round(i)),
+                ROC_95CI = paste("[",quantile(ci, 0.05) %>% round(i),";",
+                                        quantile(ci, 0.95) %>% round(i) ,"]"),
+                Brier = brier %>% round(i),
+                SMR = (sum(data$died_hosp_num)/sum(data$anzrodriskofdeath)) %>% round(i),
+                Hosmer_Lemeshow = HL_list$statistic %>% as.numeric() %>% round(i)
+        )
+        }
+
+dt %>% 
+        group_by(frail_CFS) %>% 
+        do(roc_calculate(.)) %>%
+        print() %>% 
+        write.csv(.,"./tables_figures/table2.csv")
+
+```
+
+# create figure 1
+
+```{r}
+data <- dt %>% filter(frail_CFS == "non-frail")
+data_pre <- dt %>% filter(frail_CFS == "pre-frail")
+data_frail <- dt %>% filter(frail_CFS == "frail")
+calib_plot <- function(data, replace = T, linecol = "black", df = 6, lty = 1){
+        data %>% 
+                filter(!is.na(died_hosp) & !is.na(anzrodriskofdeath)) %>%
+                mutate(died_hosp_num = as.numeric(died_hosp)-1) -> data
+        gbm::calibrate.plot(data$died_hosp, data$anzrodriskofdeath, 
+                            distribution="bernoulli", replace = replace,
+                       line.par = list(col = linecol), shade.col = "white",
+                       shade.density = 1, rug.par = list(side = 1),
+                       xlab = "ANZROD Predicted Risk of Inhospital Mortality", 
+                       ylab = "Observed Inhospital Mortality", xlim = NULL,
+                       ylim = NULL, knots = NULL, df = df, lty = lty)
+}
+calib_plot(data, df = 2)
+calib_plot(data_pre, replace=F,linecol="darkgoldenrod", df = 2, lty = 2)
+calib_plot(data_frail, replace=F,linecol="darkslategray4", df = 2, lty = 3)
+legend("bottomright", 
+       legend = c("non-frail", "pre-frail","frail"), 
+       col = c("black","darkgoldenrod", "darkslategray4"),
+       bty = "n", 
+       cex = 1.1, 
+       lty=1,
+       title = "Line Types",
+       text.col = c("black","darkgoldenrod", "darkslategray4"))
+```
+
+# Create fig 2
+```{r message=FALSE, warning=FALSE}
+roc_plot <- function(data, add = F, lty=1, linecol = "black"){
+        pROC::roc(data$died_hosp, predictor = data$anzrodriskofdeath) %>% 
+                plot(.,add = add, lty=lty, col = linecol)
+}
+roc_plot(data)
+roc_plot(data_pre, add = T, lty = 2, linecol = "darkgoldenrod")
+roc_plot(data_frail, add = T, lty = 3, linecol ="darkslategray4")
+legend("bottomright", 
+       legend = c("non-frail", "pre-frail","frail"), 
+       col = c("black","darkgoldenrod", "darkslategray4"),
+       bty = "n", 
+       cex = 1.1, 
+       lty=c(1,2,3),
+       title = "Line Types",
+       text.col = c("black","darkgoldenrod", "darkslategray4"))
+```
+
+
