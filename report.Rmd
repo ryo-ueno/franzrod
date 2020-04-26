@@ -1,5 +1,5 @@
 ---
-title: "The association between frailty and the predictive performance of ANZROD score"
+title: "<span style='font-size: 40px'>The Association between Frailty and the Predictive Performance of ANZROD Score</style>"
 author: "Ryo Ueno, Ashwin Subramaniam" 
 date: "`r format(Sys.time(), '%d/%m/%Y')`"
 output: html_document
@@ -13,18 +13,30 @@ require(pROC)
 require(ModelMetrics)
 require(ResourceSelection)
 require(gbm)
-
 rm(list=ls())
 dt <- readRDS("./data/franzrod.obj")
 ```
 
-## Objectives of this report
+For further details, please refer to this [online repository](https://github.com/ryo313/franzrod)
+<br/>
+<br/>
+
+### Objectives of this report
 
 - To clarify the motivation of the study
 - To clarify the initial statistic plan
 - To share the preliminary analysis results 
 
-## Background
+### Summary of the key findings 
+
+- Both discrimination and calibration of ANZROD score differs amongst different frailty population as follows: 
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+read.csv("./tables_figures/table2.csv") %>%
+        select(-1) %>% knitr::kable()
+```
+
+
+### Background
 
 This project is to assess the performance of ANZROD score and its performance amongst different 
 This is an R Markdown document. This summarises the data cleaning in PRO-ACT data, an [open data repository](https://nctu.partners.org/ProACT/Document/DisplayLatest/2) from multiple randomised controlled trials for patients with ALS. 
@@ -35,31 +47,39 @@ to predict
 **the functional decline or survival in 3-12 months after inclusion.**  
 Hence, we need to collect both input and output data with some time label. 
 
-## Statistical methods
+### Methods
 
 
-## Preliminary Analysis Results 
+### Preliminary Analysis Results 
 
-### Patient characteristics: continuous variables
-```{r}
+#### Patient characteristics: continuous variables
+```{r include=FALSE}
 dt %>% select(age, sex,elect,medsurg, chr_resp:cirrhos, frailty,frail_CFS,anzrodriskofdeath,
               apache3score,apache3riskofdeath,died_icu,died_hosp,admsourc) %>% 
         tableone::CreateTableOne(vars = names(.), data = ., strata = "frail_CFS") -> tableone
 
-tableone$ContTable %>% 
-        print() %>% 
+tableone$ContTable %>% print() -> conttable
+conttable %>% 
         write.csv(.,"./tables_figures/table1_cont.csv")
 ```
 
-###Patient characteristics: categorical variables
-```{r}
-tableone$CatTable %>%
-        print() %>%
-        write.csv(.,"./tables_figures/table1_cat.csv")
+
+```{r echo=FALSE}
+conttable %>% knitr::kable()
 ```
 
-###calculate table 2
-```{r message=FALSE, warning=FALSE}
+####Patient characteristics: categorical variables
+```{r include=FALSE}
+tableone$CatTable %>% print() -> cattable
+cattable %>% write.csv(.,"./tables_figures/table1_cat.csv")
+```
+
+```{r echo=FALSE}
+cattable %>% knitr::kable()
+```
+
+####calculate table 2
+```{r message=FALSE, warning=FALSE, include=FALSE}
 roc_calculate <- function(data, i=3){
         data <- data %>% 
                 filter(!is.na(died_hosp) & !is.na(anzrodriskofdeath)) %>%
@@ -71,7 +91,7 @@ roc_calculate <- function(data, i=3){
                 ROC = paste(median(ci) %>% round(i)),
                 ROC_95CI = paste("[",quantile(ci, 0.05) %>% round(i),";",
                                         quantile(ci, 0.95) %>% round(i) ,"]"),
-                Brier = brier %>% round(i),
+                Brier_score = brier %>% round(i),
                 SMR = (sum(data$died_hosp_num)/sum(data$anzrodriskofdeath)) %>% round(i),
                 Hosmer_Lemeshow = HL_list$statistic %>% as.numeric() %>% round(i)
         )
@@ -80,14 +100,19 @@ roc_calculate <- function(data, i=3){
 dt %>% 
         group_by(frail_CFS) %>% 
         do(roc_calculate(.)) %>%
-        print() %>% 
-        write.csv(.,"./tables_figures/table2.csv")
+        print() -> tabletwo
+tabletwo %>% write.csv(.,"./tables_figures/table2.csv")
 
 ```
 
-### create figure 1
+```{r echo=FALSE}
+tabletwo %>% knitr::kable()
+```
 
-```{r}
+
+#### create figure 1
+
+```{r echo=FALSE}
 data <- dt %>% filter(frail_CFS == "non-frail")
 data_pre <- dt %>% filter(frail_CFS == "pre-frail")
 data_frail <- dt %>% filter(frail_CFS == "frail")
@@ -116,8 +141,8 @@ legend("bottomright",
        text.col = c("black","darkgoldenrod", "darkslategray4"))
 ```
 
-### Create fig 2
-```{r message=FALSE, warning=FALSE}
+#### Create fig 2
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 roc_plot <- function(data, add = F, lty=1, linecol = "black"){
         pROC::roc(data$died_hosp, predictor = data$anzrodriskofdeath) %>% 
                 plot(.,add = add, lty=lty, col = linecol)
