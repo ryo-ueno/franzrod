@@ -2,7 +2,9 @@
 title: "<span style='font-size: 40px'>The Association between Frailty and the Predictive Performance of ANZROD Score</style>"
 author: "Ryo Ueno, Ashwin Subramaniam, David Pilcher" 
 date: "`r format(Sys.time(), '%d/%m/%Y')`"
-output: html_document
+output: 
+        html_document:
+                toc: true
 ---
 
 ```{r setup, include=FALSE}
@@ -18,7 +20,7 @@ rm(list=ls())
 dt <- readRDS("./data/franzrod.obj")
 ```
 
-- For further details, please refer to this [online repository](https://github.com/ryo313/franzrod) or [contact author](mailto: ryo.ueno@monash.edu)
+For further details, please refer to this [online repository](https://github.com/ryo313/franzrod) or [contact author](mailto: ryo.ueno@monash.edu)
 
 ### Objectives of this report
 
