@@ -1,6 +1,6 @@
 ---
 title: "<span style='font-size: 40px'>The Association between Frailty and the Predictive Performance of ANZROD Score</style>"
-author: "Ryo Ueno, Ashwin Subramaniam" 
+author: "Ryo Ueno, Ashwin Subramaniam, David Pilcher" 
 date: "`r format(Sys.time(), '%d/%m/%Y')`"
 output: html_document
 ---
@@ -31,7 +31,7 @@ dt <- readRDS("./data/franzrod.obj")
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
 read.csv("./tables_figures/table2.csv") %>%
-        select(-1) %>% knitr::kable()
+        select(-1) %>% knitr::kable(caption = "Summary Table: Comparison of predictive values of ANZROD to predict in-hospital mortality in three cohorts")
 ```
 
 
@@ -47,7 +47,6 @@ read.csv("./tables_figures/table2.csv") %>%
 - We hypothesized that **ANZROD may underestimate the risk of mortality amongst frail populations**. 
 
 ### Methods
-<br/>
 
 #### Study design
 - **Study design:** A multicentre retrospective cohort study
@@ -82,7 +81,8 @@ read.csv("./tables_figures/table2.csv") %>%
 ### Preliminary Analysis Results 
 
 #### Table 1-1: Patient characteristics: continuous variables
-Frail patients were older and have higher ANZROD score and APACHE-IIIj score. 
+- Frail patients were older and have higher ANZROD score and APACHE-IIIj score. 
+
 ```{r include=FALSE}
 dt %>% select(age, sex,elect,medsurg, chr_resp:cirrhos, frailty,frail_CFS,anzrodriskofdeath,
               apache3score,apache3riskofdeath,died_icu,died_hosp,admsourc) %>% 
@@ -98,30 +98,33 @@ tableone$ContTable %>%
 read.csv("./tables_figures/table1_cont_edit.csv") %>% 
         as.data.frame() %>% 
         select(-5,-6) %>% 
-        knitr::kable()
+        knitr::kable(caption = "Table 1-1: patient characteristics")
 ```
 
 #### Table 1-2: Patient characteristics: categorical variables
+- Frail cohort has more female patients.
+- Frail cohort has more emergency ICU admissions. 
+- Frail cohort has more comoridities, especially chronic respiratory conditions. 
+- Frail cohort had higher mortality both during ICU and hospital stay. 
+
 ```{r include=FALSE}
 tableone$CatTable %>% 
         print() %>% 
         write.csv(.,"./tables_figures/table1_cat.csv")
 ```
 
-- Frail cohort has more female patients.
-- Frail cohort has more emergency ICU admissions. 
-- Frail cohort has more comoridities, especially chronic respiratory conditions. 
-- Frail cohort had higher mortality both during ICU and hospital stay. 
-<br/>
-
 ```{r echo=FALSE}
 read.csv("./tables_figures/table1_cat_edit.csv") %>% 
         as.data.frame() %>% 
         select(-5,-6) %>% 
-        knitr::kable()
+        knitr::kable(caption = "Table 1-2: Patient characteristics")
 ```
 
+
 ####Table 2: Comparison of predictive values of ANZROD to predict in-hospital mortality in three cohorts
+- ROC was lower amongst frail cohort compared with non-frail cohort
+- Calibration values were similar amongst three categories. 
+- needs proofreading for the code
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 roc_calculate <- function(data, i=3){
         data <- data %>% 
@@ -147,18 +150,17 @@ dt %>%
 tabletwo %>% write.csv(.,"./tables_figures/table2.csv")
 
 ```
-- ROC was lower amongst frail cohort compared with non-frail cohort
-- Calibration values were similar amongst three categories. 
-- needs proofreading for the code
-```{r echo=FALSE}
-tabletwo %>% knitr::kable()
-```
 
+
+```{r echo=FALSE}
+tabletwo %>% knitr::kable(caption = "Table 2: Comparison of predictive values of ANZROD to predict in-hospital mortality in three cohorts")
+```
 
 #### Figure 1: Calibration Curve of ANZROD to predict inhospital mortality in three cohorts
 - Diagonal line represents the line of perfect calibration.
 - Graphically, calibration performance is worse amongst frail population. 
 - needs proofreading for the code
+
 ```{r echo=FALSE}
 data <- dt %>% filter(frail_CFS == "non-frail")
 data_pre <- dt %>% filter(frail_CFS == "pre-frail")
@@ -188,7 +190,18 @@ legend("bottomright",
        text.col = c("black","darkgoldenrod", "darkslategray4"))
 ```
 
+
 #### Figure 2: ROC of ANZROD to predict in-hospital mortality in three cohorts
+- consistent with table 2, ROC shown that ANZROD performs worse in frail population compared with non-frial population. 
+- AUROC of ANROD to predict in-hospital mortality were as follows: 
+<br/>
+        1. **non-frail:** 0.928 [ 0.916 ; 0.94 ]
+<br/>
+        2. **pre-frail:** 0.865 [ 0.841 ; 0.888 ]
+<br/>
+        3. **frail:** 0.841 [ 0.821 ; 0.861 ]
+<br/>
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 roc_plot <- function(data, add = F, lty=1, linecol = "black"){
         pROC::roc(data$died_hosp, predictor = data$anzrodriskofdeath) %>% 
@@ -207,8 +220,13 @@ legend("bottomright",
        text.col = c("black","darkgoldenrod", "darkslategray4"))
 ```
 
+
 ### Limitations
 - selection bias (patients without CFS were excluded)
 - this study includes only 5% of the original cohort used for the development of ANZROD
 - the clinical significance of the observed difference is unknown
 - This result may just reflect the non-collapsibility of AUC; however, both clinical and epidemiological evidence supports the independent association of frailty with mortality
+
+<br/>
+<br/>
+- For further details, please refer to this [online repository](https://github.com/ryo313/franzrod) or [contact author](mailto: ryo.ueno@monash.edu)
