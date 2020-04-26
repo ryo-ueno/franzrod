@@ -6,8 +6,9 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-require("tidyverse")
-require("knitr")
+require(tidyverse)
+require(knitr)
+require(kableExtra)
 require(tableone)
 require(pROC)
 require(ModelMetrics)
@@ -31,7 +32,8 @@ dt <- readRDS("./data/franzrod.obj")
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
 read.csv("./tables_figures/table2.csv") %>%
-        select(-1) %>% knitr::kable(caption = "Summary Table: Comparison of predictive values of ANZROD to predict in-hospital mortality in three cohorts")
+        select(-1) %>% knitr::kable(caption = "Summary Table: Comparison of predictive values of ANZROD to predict in-hospital mortality in three cohorts") %>%
+  kableExtra::kable_styling(bootstrap_options = "striped", full_width = F)
 ```
 
 
@@ -98,7 +100,8 @@ tableone$ContTable %>%
 read.csv("./tables_figures/table1_cont_edit.csv") %>% 
         as.data.frame() %>% 
         select(-5,-6) %>% 
-        knitr::kable(caption = "Table 1-1: patient characteristics")
+        knitr::kable(caption = "Table 1-1: patient characteristics")%>%
+  kableExtra::kable_styling(bootstrap_options = "striped", full_width = F)
 ```
 
 #### Table 1-2: Patient characteristics: categorical variables
@@ -117,7 +120,9 @@ tableone$CatTable %>%
 read.csv("./tables_figures/table1_cat_edit.csv") %>% 
         as.data.frame() %>% 
         select(-5,-6) %>% 
-        knitr::kable(caption = "Table 1-2: Patient characteristics")
+        knitr::kable(caption = "Table 1-2: Patient characteristics")%>%
+  kableExtra::kable_styling(bootstrap_options = "striped", full_width = F)%>%
+        add_indent(c(4:6,8:18))
 ```
 
 
@@ -153,7 +158,9 @@ tabletwo %>% write.csv(.,"./tables_figures/table2.csv")
 
 
 ```{r echo=FALSE}
-tabletwo %>% knitr::kable(caption = "Table 2: Comparison of predictive values of ANZROD to predict in-hospital mortality in three cohorts")
+tabletwo %>% 
+        knitr::kable(caption = "Table 2: Comparison of predictive values of ANZROD to predict in-hospital mortality in three cohorts")%>%
+  kableExtra::kable_styling(bootstrap_options = "striped", full_width = F)
 ```
 
 #### Figure 1: Calibration Curve of ANZROD to predict inhospital mortality in three cohorts
