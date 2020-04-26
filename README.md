@@ -2,7 +2,7 @@
 Source code accompanying Ueno et al. "The Association between Frailty and the Predictive Performance of ANZROD Score".
 
 ## Main files
-* [franzrod.html](https://github.com/ryo313/franzrod/edit/master/franzrod.html):
+* [report.html](https://github.com/ryo313/franzrod/blob/master/report.html):
 R markdown document to reproduce the analysis in the paper
 * data: Data folder used in the analysis
 * supplementarymaterials.pdf:
