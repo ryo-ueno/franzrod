@@ -17,8 +17,7 @@ rm(list=ls())
 dt <- readRDS("./data/franzrod.obj")
 ```
 
-For further details, please refer to this [online repository](https://github.com/ryo313/franzrod)
-<br/>
+- For further details, please refer to this [online repository](https://github.com/ryo313/franzrod) or [contact author](mailto: ryo.ueno@monash.edu)
 
 ### Objectives of this report
 
@@ -28,7 +27,7 @@ For further details, please refer to this [online repository](https://github.com
 
 ### Summary of the key findings 
 - Both discrimination and calibration of ANZROD score differs amongst different frailty population 
-- This result may support the future research to incorporate frailty score into ANZROD score
+- This result may support the future research to incorporate frailty score into ANZROD.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
 read.csv("./tables_figures/table2.csv") %>%
@@ -37,7 +36,7 @@ read.csv("./tables_figures/table2.csv") %>%
 
 
 ### Background
-- **Australian and New Zealand Risk of Death (ANZROD)** specific for Australian and New Zealand intensive care units (ICUs) has better calibration and discrimination in predicting mortality compared with the existing prognostic models sucha as APACHE III-j model.
+- **Australian and New Zealand Risk of Death (ANZROD)** specific for Australian and New Zealand intensive care units (ICUs) has better calibration and discrimination in predicting mortality compared with the existing prognostic models such as APACHE III-j model.
 
 - **Frailty** is a "physiological age" rather than a "chronological age". 
 
@@ -208,7 +207,7 @@ legend("bottomright",
        text.col = c("black","darkgoldenrod", "darkslategray4"))
 ```
 
-#### Limitations
+### Limitations
 - selection bias (patients without CFS were excluded)
 - this study includes only 5% of the original cohort used for the development of ANZROD
 - the clinical significance of the observed difference is unknown
