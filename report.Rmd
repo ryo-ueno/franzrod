@@ -1,6 +1,6 @@
 ---
 title: "<span style='font-size: 40px'>The Association between Frailty and the Predictive Performance of ANZROD Score</style>"
-author: "Ryo Ueno, Ashwin Subramaniam, David Pilcher" 
+author: "Ryo Ueno, Ashwin Subramaniam" 
 date: "`r format(Sys.time(), '%d/%m/%Y')`"
 output: 
         html_document:
