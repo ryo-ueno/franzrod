@@ -4,7 +4,7 @@ Source code accompanying Ueno et al. "The Association between Frailty and the Pr
 ## Main files
 * [report.html](https://github.com/ryo313/franzrod/blob/master/report.html):
 R markdown document to reproduce the analysis in the paper
-* data: Data folder used in the analysis
+* tables_figures:tables and figures in the original paper
 * supplementarymaterials.pdf:
 
 ## Licence
