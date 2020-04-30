@@ -2,6 +2,7 @@
 title: "<span style='font-size: 40px'>The Association between Frailty and the Predictive Performance of ANZROD Score</style>"
 author: "Ryo Ueno, Ashwin Subramaniam" 
 date: "`r format(Sys.time(), '%d/%m/%Y')`"
+always_allow_html: true
 output: 
         html_document:
                 toc: true
@@ -243,6 +244,22 @@ legend("bottomright",
 - this study includes only 5% of the original cohort used for the development of ANZROD
 - the clinical significance of the observed difference is unknown
 - This result may just reflect the non-collapsibility of AUC; however, both clinical and epidemiological evidence supports the independent association of frailty with mortality
+
+### Additional Analysis
+#### Interaction between frailty and ANZROD
+- An interaction between the two variables were confirmed by two different methods
+- First, an interaction was measured in the following formula 
+- Additionally, an interaction was measured with CFS as a continuous variable.
+```{r}
+glm(I(died_hosp==1)~frail_CFS+anzrodriskofdeath+anzrodriskofdeath*frail_CFS, family=binomial,data=dt) %>% summary()
+```
+
+
+  
+```{r}
+glm(I(died_hosp==1)~frailty+anzrodriskofdeath+anzrodriskofdeath*frailty, family=binomial,data=dt) %>% summary()
+```
+
 
 <br/>
 <br/>

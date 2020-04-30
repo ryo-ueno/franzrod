@@ -193,6 +193,7 @@ summary {
 <li><a href="#methods">Methods</a></li>
 <li><a href="#preliminary-analysis-results">Preliminary Analysis Results</a></li>
 <li><a href="#limitations">Limitations</a></li>
+<li><a href="#additional-analysis">Additional Analysis</a></li>
 </ul>
 </div>
 
@@ -874,7 +875,81 @@ Figure 2: ROC of ANZROD to predict in-hospital mortality in three cohorts
 <li>the clinical significance of the observed difference is unknown</li>
 <li>This result may just reflect the non-collapsibility of AUC; however, both clinical and epidemiological evidence supports the independent association of frailty with mortality</li>
 </ul>
+</div>
+<div id="additional-analysis" class="section level3">
+<h3>Additional Analysis</h3>
+<div id="interaction-between-frailty-and-anzrod" class="section level4">
+<h4>Interaction between frailty and ANZROD</h4>
+<ul>
+<li>An interaction between the two variables were confirmed by two different methods</li>
+<li>First, an interaction was measured in the following formula</li>
+<li>Additionally, an interaction was measured with CFS as a continuous variable.</li>
+</ul>
+<pre class="r"><code>glm(I(died_hosp==1)~frail_CFS+anzrodriskofdeath+anzrodriskofdeath*frail_CFS, family=binomial,data=dt) %&gt;% summary()</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = I(died_hosp == 1) ~ frail_CFS + anzrodriskofdeath + 
+##     anzrodriskofdeath * frail_CFS, family = binomial, data = dt)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.6669  -0.3441  -0.2293  -0.2014   2.8057  
+## 
+## Coefficients:
+##                                      Estimate Std. Error z value Pr(&gt;|z|)
+## (Intercept)                          -3.93252    0.09392 -41.872  &lt; 2e-16
+## frail_CFSpre-frail                    0.68805    0.15324   4.490 7.12e-06
+## frail_CFSfrail                        1.08386    0.14314   7.572 3.68e-14
+## anzrodriskofdeath                     7.94581    0.30090  26.406  &lt; 2e-16
+## frail_CFSpre-frail:anzrodriskofdeath -1.75509    0.47576  -3.689 0.000225
+## frail_CFSfrail:anzrodriskofdeath     -2.17823    0.44621  -4.882 1.05e-06
+##                                         
+## (Intercept)                          ***
+## frail_CFSpre-frail                   ***
+## frail_CFSfrail                       ***
+## anzrodriskofdeath                    ***
+## frail_CFSpre-frail:anzrodriskofdeath ***
+## frail_CFSfrail:anzrodriskofdeath     ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 6016.2  on 9430  degrees of freedom
+## Residual deviance: 4044.4  on 9425  degrees of freedom
+##   (9 observations deleted due to missingness)
+## AIC: 4056.4
+## 
+## Number of Fisher Scoring iterations: 6</code></pre>
+<pre class="r"><code>glm(I(died_hosp==1)~frailty+anzrodriskofdeath+anzrodriskofdeath*frailty, family=binomial,data=dt) %&gt;% summary()</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = I(died_hosp == 1) ~ frailty + anzrodriskofdeath + 
+##     anzrodriskofdeath * frailty, family = binomial, data = dt)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.6134  -0.3263  -0.2409  -0.1918   2.9242  
+## 
+## Coefficients:
+##                           Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)               -4.73703    0.16449 -28.798  &lt; 2e-16 ***
+## frailty                    0.33884    0.03836   8.833  &lt; 2e-16 ***
+## anzrodriskofdeath          9.21316    0.50391  18.283  &lt; 2e-16 ***
+## frailty:anzrodriskofdeath -0.61860    0.11506  -5.376  7.6e-08 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 6016.2  on 9430  degrees of freedom
+## Residual deviance: 4027.6  on 9427  degrees of freedom
+##   (9 observations deleted due to missingness)
+## AIC: 4035.6
+## 
+## Number of Fisher Scoring iterations: 6</code></pre>
 <p><br /> <br /> - For further details, please refer to this <a href="https://github.com/ryo313/franzrod">online repository</a> or <a href="mailto:%20ryo.ueno@monash.edu">contact author</a></p>
+</div>
 </div>
 
 
