@@ -239,7 +239,7 @@ legend("bottomright",
 
 
 ### Limitations
-- selection bias (patients without CFS were excluded)
+- selection bias (patients without CFS were excluded); needs to count the number of hospitals in our dataset
 - this study includes only 5% of the original cohort used for the development of ANZROD
 - the clinical significance of the observed difference is unknown
 - This result may just reflect the non-collapsibility of AUC; however, both clinical and epidemiological evidence supports the independent association of frailty with mortality
