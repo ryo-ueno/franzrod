@@ -261,6 +261,20 @@ glm(I(died_hosp==1)~frailty+anzrodriskofdeath+anzrodriskofdeath*frailty, family=
 ```
 
 
+#### repeat analysis with dichotomized frailty data
+```{r message=FALSE, include=FALSE}
+dt %>% 
+        group_by(frail_CFS_di) %>% 
+        do(roc_calculate(.)) %>%
+        print() -> stabletwo
+tabletwo %>% write.csv(.,"./tables_figures/stable2.csv")
+```
+```{r echo=FALSE}
+stabletwo %>% 
+        knitr::kable(caption = "Table 2: Comparison of predictive values of ANZROD to predict in-hospital mortality in two cohorts")%>%
+  kableExtra::kable_styling(bootstrap_options = "striped", full_width = F)
+```
+
 <br/>
 <br/>
 - For further details, please refer to this [online repository](https://github.com/ryo313/franzrod) or [contact author](mailto: ryo.ueno@monash.edu)
